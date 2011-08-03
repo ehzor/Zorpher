@@ -1,0 +1,26 @@
+Zorpher is a "forked" version of an earlier project, Viegenere Cipher 2011 (VC2011).  There are two main differences between the two:
+
+1.  Zorpher is written in C++
+2.  Zorpher is built to be more expandable
+
+During the process of writing VC2011, the code was constantly getting changed and mangled.  As such, memory management quickly got out of hand.  Soon, the choice to re-write the entire program in C++ became more and more logical.
+
+Zorpher utilizes more recent advancements, as well.  Instead of using select() to poll the sockets to see what's ready to be read, epoll() is used.  This allows for greater scalability, as well as simpler code.
+
+In writing this revised version, there's two main goals:
+
+1.  Make it more robust when it comes to connections and polling
+2.  Have the network code work properly
+
+The development cycle of Zorpher will be as follows:
+
+1.  Ensure network code is properly coded.
+	+ One of the main issues previously is that as long as a constant send/recv stream as performed, the code worked fine.  However, once it ventured into send/send/recv and the like, several issues occurred that made it quite difficult to get back into working order.
+2.  Implement the Viegenere Cipher
+	+ The vc.h code in the previous part works just fine for this.  However, this will be re-written to be more C++ compliant, which will help tremendously
+3.  Implement a key exchange
+	+ This will semi-depend on if the user wants GMP (and subsequently GMPxx) used as well.  If so, a lot of possibilities to this will be available.  However, even if GMP isn't wanting to be used, then some more simplistic designs will be available.  This is not to force GMP to be used, but due to the restrictions of uint64, GMP allows for vast greater capabilities when it comes to this.
+
+Please note that while GMP is available to be used, due to most users not having data more than 10-20 characters, GMP is optional.  Its usage is only for the key exchange to provide large integers to help in the aid of cryptography.
+
+The implementation of Viegenere Cipher is simple.  However, to aide in the one-time pad (OTP) system, the key will have a very low residue.  The implementation of a key exchange will be used to encrypt the Viegenere Cipher data (including the key itself).  However, if a key exchange isn't used, the chance of the key being reusable is very small, as the key is based off /dev/urandom.
