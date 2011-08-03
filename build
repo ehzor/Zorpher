@@ -19,23 +19,27 @@ if [ -e "$BINARY" ]; then
 	rm -rf $BINARY
 fi
 
-# If we found GMP, compile with it, otherwise don't.
+# If we are compiling with GMP support, let the user know
 if [ -n "$GMP_LIB" ]; then
-	echo "Building Zorpher with GMP support..."
-
-	for i in $BINARY
-	do
-		echo "Compiling $i"
-		g++ -Wcpp -Wall -I"$GMP_INC" -L"$GMP_LIB" $i.cpp -o $i -lgmp -lgmpxx
-	done
-else
-	echo "Building Zorpher without GMP support..."
-
-	for i in $BINARY
-	do
-		g++ -Wcpp -Wall $i.cpp -o $i
-	done
+	echo "Building Zorpher with GMP support."
 fi
+
+# For each binary to create, do it...
+for i in $BINARY
+do
+	# Only compile if file is found (take this if block out once client code is being done)...
+	if [ -e "$i.cpp" ]; then
+		# Not really needed, but nice anyways
+		echo "Compiling $i"
+
+		# If GMP support was found, compile it in, otherwise don't
+		if [ -n "GMP_LIB" ]; then
+			g++ -Wcpp -Wall -I"$GMP_INC" -L"$GMP_LIB" -o $i -lgmp -lgmpxx $i.cpp
+		else
+			g++ -Wcpp -Wall -o $i $i.cpp
+		fi
+	fi
+done
 
 # Run the binary
 #if [ -e "$BINARY" ]; then
