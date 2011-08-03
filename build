@@ -14,11 +14,6 @@ else
 	GMP_LIB=""
 fi
 
-# If the binary is already there, delete it
-if [ -e "$BINARY" ]; then
-	rm -rf $BINARY
-fi
-
 # If we are compiling with GMP support, let the user know
 if [ -n "$GMP_LIB" ]; then
 	echo "Building Zorpher with GMP support."
@@ -27,6 +22,11 @@ fi
 # For each binary to create, do it...
 for i in $BINARY
 do
+	# If the binary is already there, delete it
+	if [ -e $i ]; then
+		rm -rf $i
+	fi
+
 	# Only compile if file is found (take this if block out once client code is being done)...
 	if [ -e "$i.cpp" ]; then
 		# Not really needed, but nice anyways
