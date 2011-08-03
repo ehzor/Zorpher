@@ -1,0 +1,49 @@
+COMPILE
+=====================================
+
+Running the "build" script should suffice for most cases.  However, if you plan to use GMP and have the headers and libraries instead in some other path besides /usr/{include,lib} or /usr/local/{include,lib}, then you must edit the "GMP_INC=" and "GMP_LIB=" paths accordingly.
+
+INSTALL
+=====================================
+
+The module will install itself, but make sure you have sufficient write access to the /etc/pam.d and /lib/security directories.
+
+HOW-TO USE
+=====================================
+
+Using Zorpher is pretty simple.
+
+-- SERVER --
+Simply run the server binary. By default, it runs on 0.0.0.0 on port 4309.  If you want to change either, then use the following command line options:
+
+CMD		: DESCRIPTION										: EXAMPLE
+host=<text>	: What host/IP to listen on.  If a non-IP host is given, it's converted to an IP.	: host=secure.login.domain (OR host=10.0.1.23)
+port=<integer>	: The port the server will listen on.							: port=8503
+
+Please note that if the server isn't being run as root, then port will have to be higher than 1024.  This is a security measure in place in Linux itself.
+
+Also, make sure that the firewall has the appropriate settings for the port and host.
+
+-- CLIENT --
+The client library (.so file) will be stored in /lib/security.  In order to use this authentication method, you will have to do the following (assuming you want to use this for sytem login, and make this the only authentication method):
+
+1.  Edit /etc/pam.d/login
+2.  Comment out (put a # before each line) that starts with "auth"
+3.  Add this near the top:
+	auth pam_zorpher.so host=<str>,port=<integer>
+3(a): If the authentication server is running on secure.login.domain on port 8503 for example, you'd do the following:
+	auth pam_zorpher.so host=secure.login.domain,port=8503
+4.  Save
+
+Whenever a user tries to log into that machine now, they will have to authenticate with the Zorpher PAM module.
+
+Other options include:
+
+CMD		: DESCRIPTION			: EXMAPLE
+GMP=<1/0>	: Whether to use GMP library 	: GMP=1 (use), GMP = 0 (don't use)
+KX=<text>	: The Key Exchange to use	: KX=DH (use Diffie-Hellman)
+
+As of right now, no key exchanges are implemented.  However, once there is, both the server and client will be able to.  The proposed options so far are:
+
+DH	: Diffie-Hellman
+ZORPHER : Custom key exchange protocol
