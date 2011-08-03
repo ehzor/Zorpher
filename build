@@ -1,0 +1,43 @@
+#!/bin/sh
+
+BINARY="server client"
+
+# If GMP is detected build it in by default, otherwise don't
+if [ -e "/usr/include/gmp.h" ]; then
+	GMP_INC="/usr/include"
+	GMP_LIB="/usr/lib"
+elif [ -e "/usr/local/include/gmp/gmp.h" ]; then
+	GMP_INC="/usr/local/include/gmp"
+	GMP_LIB="/usr/local/lib"
+else
+	GMP_INC=""
+	GMP_LIB=""
+fi
+
+# If the binary is already there, delete it
+if [ -e "$BINARY" ]; then
+	rm -rf $BINARY
+fi
+
+# If we found GMP, compile with it, otherwise don't.
+if [ -n "$GMP_LIB" ]; then
+	echo "Building Zorpher with GMP support..."
+
+	for i in $BINARY
+	do
+		echo "Compiling $i"
+		g++ -Wcpp -Wall -I"$GMP_INC" -L"$GMP_LIB" $i.cpp -o $i -lgmp -lgmpxx
+	done
+else
+	echo "Building Zorpher without GMP support..."
+
+	for i in $BINARY
+	do
+		g++ -Wcpp -Wall $i.cpp -o $i
+	done
+fi
+
+# Run the binary
+#if [ -e "$BINARY" ]; then
+#	./$BINARY
+#fi
