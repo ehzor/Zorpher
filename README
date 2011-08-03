@@ -1,3 +1,5 @@
+Zorpher is primed to be a PAM authentication module that will authenticate the user against the server's /etc/shadow file.  There were considerations to use a different database for this (such as a custom one), but as the benefits of using /etc/shadow outweigh the other options, this seemd to be the most viable option.  The issue with using a custom database is wanting to make Zorpher as independent as possible.  By this, Zorpher should be able to be compiled with Linux-only headers, no requirements on third-party libraries.  While coding an MD5 table, for example, could be self-coded, it was determined early on in the thought process that this is simply the best way to handle authentication.  Please read INSTALL for more information on compiling, installing and using Zorpher.
+
 Zorpher is a "forked" version of an earlier project, Viegenere Cipher 2011 (VC2011).  There are two main differences between the two:
 
 1.  Zorpher is written in C++
@@ -5,7 +7,13 @@ Zorpher is a "forked" version of an earlier project, Viegenere Cipher 2011 (VC20
 
 During the process of writing VC2011, the code was constantly getting changed and mangled.  As such, memory management quickly got out of hand.  Soon, the choice to re-write the entire program in C++ became more and more logical.
 
-Zorpher utilizes more recent advancements, as well.  Instead of using select() to poll the sockets to see what's ready to be read, epoll() is used.  This allows for greater scalability, as well as simpler code.
+Zorpher utilizes more recent advancements, as well.  Some of these features include:
+
+1.  Using epoll() instead of select() to manage the sockets
+2.  Setting non-blocking sockets through fcntl(), or ioctl() if fcntl() is not supported.
+3.  Using std namespace for string and others to ease the memory management
+4.  Setting the TCP_NODELAY option to disable the Nigale Algorithm
+	+ This was done for one reason: the Nigale Algorithm is great if your payload is big.  However, and this seems to be the cause for the earlier issues, if your payload is less than 40 bytes (TCP/IP header length), the algorithm pretty much forces multiple reads/sends into the buffer.  This is not efficient for this authentication module.
 
 In writing this revised version, there's two main goals:
 
